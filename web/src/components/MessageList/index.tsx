@@ -1,41 +1,49 @@
+import { api } from '../../services/api';
+
 import styles from './styles.module.scss';
 import logImg from '../../assets/logo.svg'
+import { useEffect, useState } from 'react';
+
+type Message = {
+    id: string;
+    text: string;
+    user: {
+        name: string;
+        avatar_url: string;
+    }
+}
 
 export function MessageList() {
+
+    const [messages, setMessages] = useState<Message[]>([]);
+
+    useEffect(() => {
+        api.get<Message[]>('messages/last3').then(resp => {
+            setMessages(resp.data)
+        })
+    }, [])
+
     return (
         <div className={styles.messageListWrapper}>
             <img src={logImg} alt="DoWhile 2021" />
 
             <ul className={styles.messageList}>
-                <li>
-                    <p className={styles.messageContent}>Meu nome é Matheus Gonçalves Rocha</p>
-                    <div className={styles.messageUser}>
-                        <div className={styles.userImage}>
-                            <img src="https://github.com/matheus98rocha.png" alt="photoProfile" />
-                        </div>
-                        <span>Matheus Rocha</span>
-                    </div>
-                </li>
+                {
+                    messages.map(message => {
+                        return (
+                            <li className={styles.message} key={message.id}>
+                                <p className={styles.messageContent}>{message.text}</p>
+                                <div className={styles.messageUser}>
+                                    <div className={styles.userImage}>
+                                        <img src={message.user.avatar_url} alt="photoProfile" />
+                                    </div>
+                                    <span>{message.user.name}</span>
+                                </div>
+                            </li>
 
-                <li>
-                    <p className={styles.messageContent}>Meu nome é Matheus Gonçalves Rocha</p>
-                    <div className={styles.messageUser}>
-                        <div className={styles.userImage}>
-                            <img src="https://github.com/matheus98rocha.png" alt="photoProfile" />
-                        </div>
-                        <span>Matheus Rocha</span>
-                    </div>
-                </li>
-
-                <li>
-                    <p className={styles.messageContent}>Meu nome é Matheus Gonçalves Rocha</p>
-                    <div className={styles.messageUser}>
-                        <div className={styles.userImage}>
-                            <img src="https://github.com/matheus98rocha.png" alt="photoProfile" />
-                        </div>
-                        <span>Matheus Rocha</span>
-                    </div>
-                </li>
+                        )
+                    })
+                }
             </ul>
         </div>
     )
